@@ -15,6 +15,7 @@
 ###
 
 import pandas as pd
+import numpy as np
 
 # independent features with gaussian distrobution (14 features)
 features = ["Wine type","Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
@@ -22,16 +23,19 @@ features = ["Wine type","Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Ma
             "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline"]
 
 # Read .csv file  
-wineDataSet = pd.read_csv('ML-HW1-UCI-Wine-Dataset/Wine.csv', header=None)
+wineDataSet = pd.read_csv('Wine.csv', header=None)
 # Add title to dataset
 # wineDataSet.columns = features
 
-# print(wineDataSet)
+# Find the number of different wines in the data set
+sets_of_wine = [0,0,0]
+for i in range(wineDataSet.shape[0]):
+    sets_of_wine[int(wineDataSet[0].values[i])-1]+=1
 
 # Wine 1: 1-59, Wine 2: 60-130, Wine 3: 131-178
-wine1 = wineDataSet.iloc[   : 59,:]
-wine2 = wineDataSet.iloc[ 59:130,:]
-wine3 = wineDataSet.iloc[130:   ,:]
+wine1 = wineDataSet.iloc[               :sets_of_wine[0]                ,:]
+wine2 = wineDataSet.iloc[sets_of_wine[0]:sets_of_wine[0]+sets_of_wine[1],:]
+wine3 = wineDataSet.iloc[sets_of_wine[0]+sets_of_wine[1]:               ,:]
 
 # Sample the wine according to its label 
 wine1_test = wine1.sample(n=18)
@@ -46,3 +50,39 @@ train_data = pd.concat([wine1_train, wine2_train, wine3_train])
 test_data = pd.concat([wine1_test, wine2_test, wine3_test])
 
 
+# Find the number of different wines in the training set
+sets_of_wine = [0,0,0]
+for i in range(train_data.shape[0]):
+    sets_of_wine[train_data[0].values[i]-1]+=1
+
+# Calculate mean and standard deviation of each feature of different wine. 
+# Stored as [mean_feature1, stdev_feature1], ... (13 for each wine)
+feature_distribution = []
+data_accum = 0
+for i in range(3):
+    for j in range(13):
+        # calculate mean and stdev for train_data[0:sets_of_wine[i]][j+1]
+        mean  = np.average(train_data[j+1].values[data_accum:data_accum+sets_of_wine[i]])
+        stdev = np.std(train_data[j+1].values[data_accum:data_accum+sets_of_wine[i]])
+        feature_distribution.append([mean,stdev])
+    data_accum += sets_of_wine[i]
+
+# Calculate prior for each wine
+priors = [0,0,0]
+train_total = sets_of_wine[0]+sets_of_wine[1]+sets_of_wine[2]
+for i in range(3):
+    priors[i] = sets_of_wine[i]/train_total
+
+# Compute posteriors for MAP
+
+
+
+# # print(train_data[1].values[0:15])
+# print(train_data)
+# print(train_data[1].values[0:10])
+
+# # Access test
+# test = (1,5)
+# test2 = (2,10)
+# l = [test,test2]
+# print(l[0][1])
