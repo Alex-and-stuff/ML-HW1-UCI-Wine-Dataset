@@ -12,10 +12,21 @@
 #    distribution of the training set.
 # 3. Calculate the accuracy rate of the MAP detector (should exceed 90%)
 # 4. Plot visualized result of the "testing data" (with built in PCA fcn)
+#
+# *Note: all features are independent and the distribution of them is Gaussian distribution
 ###
 
+from math import e, exp, sqrt, pi
+from turtle import pos
 import pandas as pd
 import numpy as np
+from torch import norm
+
+# Build function for creating a Normal (Gaussain) distribution function
+def normal_dist(x, mean, stdev):
+    prob_density = 1/sqrt(2*pi)/stdev*exp(-pow(x-mean,2)/2/stdev/stdev)
+    # prob_density = pi*stdev*exp(-0.5*((x-mean)/stdev)**2)
+    return prob_density
 
 # independent features with gaussian distrobution (14 features)
 features = ["Wine type","Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
@@ -73,9 +84,55 @@ train_total = sets_of_wine[0]+sets_of_wine[1]+sets_of_wine[2]
 for i in range(3):
     priors[i] = sets_of_wine[i]/train_total
 
-# Compute posteriors for MAP
+# Thought process
+# 1. maybe put in the test data into the individual pdfs and sum them up
+# 2. mutiply it by the prior
+# 3. compare the 3 values and find the maximum -> the most likely wine!
+
+# 1. go through the test datas, 
+# 2. go through the three wines,
+# 3. compute the all 13 pdfs for each wine 
+# 4. multiply it with the prior
+# 5. find the max value of the three wines 
+# 6. get the MAP of the three kinds of wines
+# 7. compare it with the labels (if correct -> correctly_labeled+=1)
+# 8. calculate the accuracy
+
+# Calculate the MAP for all test data
+wine_posterior = [0,0,0]
+correctly_labeled = 0
+prediction = []
+
+for i in range(test_data.shape[0]):
+# for i in range(5):
+    for j in range(3):
+        posterior = 1
+        for k in range(13):
+            posterior *= normal_dist(test_data[k+1].values[i], feature_distribution[13*j+k][0], feature_distribution[13*j+k][1])
+            # print(posterior)
+        posterior *= priors[j]
+        wine_posterior[j] = posterior
+    # print(wine_posterior)
+    prediction.append(wine_posterior.index(max(wine_posterior))+1)
+    if prediction[i] == test_data[0].values[i]:
+        correctly_labeled+=1
+
+accuracy = correctly_labeled/test_data.shape[0]
+print(accuracy)
+
+print(prediction, len(prediction))
+# print(test_data)
+# print(test_data[0].values[30])
+
+# print(feature_distribution, feature_distribution[1][0])
+
+# print(wine_posterior, wine_posterior.index(max(wine_posterior))+1, test_data[0].values[0])
+    
+# prediction.append(wine_posterior.index(max(wine_posterior))) 
 
 
+# print(normal_dist(test_data[0].values[2], feature_distribution[2][0], feature_distribution[2][1]))
+# print(test_data.shape[0])
 
 # # print(train_data[1].values[0:15])
 # print(train_data)
