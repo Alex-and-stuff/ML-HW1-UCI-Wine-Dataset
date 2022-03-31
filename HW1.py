@@ -16,11 +16,13 @@
 # *Note: all features are independent and the distribution of them is Gaussian distribution
 ###
 
-from math import e, exp, sqrt, pi
-from turtle import pos
+from cgi import test
+from math import exp, sqrt, pi
 import pandas as pd
 import numpy as np
-from torch import norm
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # Build function for creating a Normal (Gaussain) distribution function
 def normal_dist(x, mean, stdev):
@@ -104,12 +106,10 @@ correctly_labeled = 0
 prediction = []
 
 for i in range(test_data.shape[0]):
-# for i in range(5):
     for j in range(3):
         posterior = 1
         for k in range(13):
             posterior *= normal_dist(test_data[k+1].values[i], feature_distribution[13*j+k][0], feature_distribution[13*j+k][1])
-            # print(posterior)
         posterior *= priors[j]
         wine_posterior[j] = posterior
     # print(wine_posterior)
@@ -121,25 +121,55 @@ accuracy = correctly_labeled/test_data.shape[0]
 print(accuracy)
 
 print(prediction, len(prediction))
-# print(test_data)
-# print(test_data[0].values[30])
 
-# print(feature_distribution, feature_distribution[1][0])
+# Show results with sklearn.decomposition.PCA function
+test_data_no_label = test_data.iloc[: , 1:]
+labels = test_data[0].tolist()
+print(labels)
 
-# print(wine_posterior, wine_posterior.index(max(wine_posterior))+1, test_data[0].values[0])
-    
-# prediction.append(wine_posterior.index(max(wine_posterior))) 
+# Plot test data using PCA with dimentions decreased to 3D
+pca = PCA(n_components=3) 
+pca.fit(test_data_no_label) 
+print(pca.explained_variance_ratio_) 
+print(pca.explained_variance_)
+
+test_pca_3d = pca.transform(test_data_no_label) 
+fig1 = plt.figure() 
+ax = Axes3D(fig1, rect=[0, 0, 1, 1], elev=30, azim=20)
+for i in range(len(labels)):
+    if labels[i] == 1:
+        c = 'r'
+        target_name = 'wine 1'
+    elif labels[i] == 2:
+        c = 'g'
+        target_name = 'wine 2'
+    else:
+        c = 'b'
+        target_name = 'wine 3'
+    ax.scatter(test_pca_3d[i, 0], test_pca_3d[i, 1],test_pca_3d[i, 2],marker='o',c=c, label=target_name)
+
+# Plot test data using PCA with dimentions decreased to 2D
+pca2d = PCA(n_components=2) 
+pca2d.fit(test_data_no_label) 
+print(pca2d.explained_variance_ratio_) 
+print(pca2d.explained_variance_)
+
+test_pca_2d = pca2d.transform(test_data_no_label) 
+fig2 = plt.figure() 
+for i in range(len(labels)):
+    if labels[i] == 1:
+        c = 'r'
+        target_name = 'wine 1'
+    elif labels[i] == 2:
+        c = 'g'
+        target_name = 'wine 2'
+    else:
+        c = 'b'
+        target_name = 'wine 3'
+    plt.scatter(test_pca_2d[i, 0], test_pca_2d[i, 1],marker='o',c=c, label=target_name)
+plt.show()
 
 
-# print(normal_dist(test_data[0].values[2], feature_distribution[2][0], feature_distribution[2][1]))
-# print(test_data.shape[0])
-
-# # print(train_data[1].values[0:15])
-# print(train_data)
-# print(train_data[1].values[0:10])
-
-# # Access test
-# test = (1,5)
-# test2 = (2,10)
-# l = [test,test2]
-# print(l[0][1])
+# References:
+# https://towardsdatascience.com/mle-vs-map-a989f423ae5c
+# https://kknews.cc/zh-tw/code/kvzpj5b.html
