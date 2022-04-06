@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 '''
                        [ ML HW1 ]
 
@@ -12,37 +11,14 @@ Goal: determine which type of wine according to the given features
 *Note: all features are independent and the distribution of them is Gaussian distribution
 '''
 
-=======
-### 
-# In the "Wine Data Set", there are 3 types of wines and 13 different 
-# features of each instance -> [178*14] matrix (178 instances and 14 
-# features). In this HW, we will implement the MAP of the classifier
-# for 54 instances with their features.
-#
-# Goal: determine which type of wine according to the given features
-# 
-# 1. Split dataset to train and test datasets, for each type of wine, 
-#    randomly split 18 for testing. train_set:[124*14] test_set:[54*14]
-# 2. Evaluate posterior probabilities with likelihood fcns and prior 
-#    distribution of the training set.
-# 3. Calculate the accuracy rate of the MAP detector (should exceed 90%)
-# 4. Plot visualized result of the "testing data" (with built in PCA fcn)
-#
-# *Note: all features are independent and the distribution of them is Gaussian distribution
-###
 
-from cgi import test
->>>>>>> d77f84f79e828be97d04abf31aefbe152a34a3ca
 from math import exp, sqrt, pi
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-<<<<<<< HEAD
 from sympy import false
-=======
->>>>>>> d77f84f79e828be97d04abf31aefbe152a34a3ca
 
 # Build function for creating a Normal (Gaussain) distribution function
 def normal_dist(x, mean, stdev):
@@ -91,14 +67,11 @@ test_data = pd.concat([wine1_test, wine2_test, wine3_test])
 train_data.to_csv('train_data.csv',index=false)
 test_data.to_csv('test_data.csv',index=false)
 
-<<<<<<< HEAD
 '''
 Part 2.
 Evaluate posterior probabilities with likelihood fcns and prior 
 distribution of the training set.
 '''
-=======
->>>>>>> d77f84f79e828be97d04abf31aefbe152a34a3ca
 # Find the number of different wines in the training set
 sets_of_wine = [0,0,0]
 for i in range(train_data.shape[0]):
@@ -154,7 +127,6 @@ for i in range(test_data.shape[0]):
         correctly_labeled+=1
 
 accuracy = correctly_labeled/test_data.shape[0]
-<<<<<<< HEAD
 print('Accuracy:', accuracy)
 
 print('Prediction:   ', prediction)
@@ -167,7 +139,6 @@ Calculate the accuracy rate of the MAP detector (should exceed 90%)
 test_data_no_label = test_data.iloc[: , 1:]
 labels = test_data[0].tolist()
 print('Ground truth: ', labels)
-=======
 print(accuracy)
 
 print(prediction, len(prediction))
@@ -176,7 +147,6 @@ print(prediction, len(prediction))
 test_data_no_label = test_data.iloc[: , 1:]
 labels = test_data[0].tolist()
 print(labels)
->>>>>>> d77f84f79e828be97d04abf31aefbe152a34a3ca
 
 # Plot test data using PCA with dimentions decreased to 3D
 pca = PCA(n_components=3) 
