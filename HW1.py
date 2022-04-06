@@ -33,7 +33,8 @@ features = ["Wine type","Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Ma
 
 # Read .csv file  
 wineDataSet = pd.read_csv('Wine.csv', header=None)
-# Add title to dataset
+
+## Add title to dataset
 # wineDataSet.columns = features
 
 # Find the number of different wines in the data set
@@ -83,7 +84,6 @@ feature_distribution = []
 data_accum = 0
 for i in range(3):
     for j in range(13):
-        # calculate mean and stdev for train_data[0:sets_of_wine[i]][j+1]
         mean  = np.average(train_data[j+1].values[data_accum:data_accum+sets_of_wine[i]])
         stdev = np.std(train_data[j+1].values[data_accum:data_accum+sets_of_wine[i]])
         feature_distribution.append([mean,stdev])
@@ -95,28 +95,30 @@ train_total = sets_of_wine[0]+sets_of_wine[1]+sets_of_wine[2]
 for i in range(3):
     priors[i] = sets_of_wine[i]/train_total
 
-# Thought process
-# 1. maybe put in the test data into the individual pdfs and sum them up
-# 2. mutiply it by the prior
-# 3. compare the 3 values and find the maximum -> the most likely wine!
+# # Change prior to extreme values (testing the effect of priors)
+# small_val = 0.0000000000001
+# priors = [small_val, 1-2*small_val, small_val] 
 
-# 1. go through the test datas, 
-# 2. go through the three wines,
-# 3. compute the all 13 pdfs for each wine 
-# 4. multiply it with the prior
-# 5. find the max value of the three wines 
-# 6. get the MAP of the three kinds of wines
-# 7. compare it with the labels (if correct -> correctly_labeled+=1)
-# 8. calculate the accuracy
+'''
+Thought process
+1. maybe put in the test data into the individual pdfs and sum them up
+2. mutiply it by the prior
+3. compare the 3 values and find the maximum -> the most likely wine!
+Excecution process
+1. go through the test datas, 
+2. go through the three wines,
+3. compute the all 13 pdfs for each wine 
+4. multiply it with the prior
+5. find the max value of the three wines 
+6. get the MAP of the three kinds of wines
+7. compare it with the labels (if correct -> correctly_labeled+=1)
+8. calculate the accuracy
+'''
 
 # Calculate the MAP for all test data
 wine_posterior = [0,0,0]
 correctly_labeled = 0
 prediction = []
-
-# # Change prior to extreme values (testing the effect of priors)
-# small_val = 0.0000000000001
-# priors = [small_val, 1-2*small_val, small_val] 
 
 for i in range(test_data.shape[0]):
     for j in range(3):
@@ -125,14 +127,13 @@ for i in range(test_data.shape[0]):
             posterior *= normal_dist(test_data[k+1].values[i], feature_distribution[13*j+k][0], feature_distribution[13*j+k][1])
         posterior *= priors[j]
         wine_posterior[j] = posterior
-    # print(wine_posterior)
     prediction.append(wine_posterior.index(max(wine_posterior))+1)
     if prediction[i] == test_data[0].values[i]:
         correctly_labeled+=1
-
 accuracy = correctly_labeled/test_data.shape[0]
-print('Accuracy:', accuracy)
 
+# Show MAP results
+print('Accuracy:     ', accuracy)
 print('Prediction:   ', prediction)
 
 '''
@@ -141,21 +142,13 @@ Calculate the accuracy rate of the MAP detector (should exceed 90%)
 '''
 # Show results with sklearn.decomposition.PCA function
 test_data_no_label = test_data.iloc[: , 1:]
-labels = test_data[0].tolist()
+labels = test_data[0].tolist()                          # use labels (ground truth) as color difference
 print('Ground truth: ', labels)
-
-# Show results with sklearn.decomposition.PCA function
-test_data_no_label = test_data.iloc[: , 1:]
-labels = test_data[0].tolist()   # use labels (ground truth) as color difference
-labels = prediction              # use perdiction as color difference
-print(labels)
+labels = prediction                                     # use perdiction as color difference
 
 # Plot test data using PCA with dimentions decreased to 3D
 pca = PCA(n_components=3) 
 pca.fit(test_data_no_label) 
-print(pca.explained_variance_ratio_) 
-print(pca.explained_variance_)
-
 test_pca_3d = pca.transform(test_data_no_label) 
 fig1 = plt.figure() 
 ax = Axes3D(fig1, rect=[0, 0, 1, 1], elev=30, azim=20)
@@ -163,24 +156,18 @@ target_names = ['wine 1','wine 2','wine 3']
 for i in range(len(labels)):
     if labels[i] == 1:
         c = 'r'
-        # target_name = 'wine 1'
         target_name = target_names[0]
     elif labels[i] == 2:
         c = 'g'
-        # target_name = 'wine 2'
         target_name = target_names[1]
     else:
         c = 'b'
-        # target_name = 'wine 3'
         target_name = target_names[2]
     ax.scatter(test_pca_3d[i, 0], test_pca_3d[i, 1],test_pca_3d[i, 2],marker='o',c=c, label=target_name)
 
 # Plot test data using PCA with dimentions decreased to 2D
 pca2d = PCA(n_components=2) 
 pca2d.fit(test_data_no_label) 
-print(pca2d.explained_variance_ratio_) 
-print(pca2d.explained_variance_)
-
 test_pca_2d = pca2d.transform(test_data_no_label) 
 fig2 = plt.figure() 
 for i in range(len(labels)):
