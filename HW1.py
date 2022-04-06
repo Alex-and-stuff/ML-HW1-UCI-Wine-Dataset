@@ -114,6 +114,10 @@ wine_posterior = [0,0,0]
 correctly_labeled = 0
 prediction = []
 
+# # Change prior to extreme values (testing the effect of priors)
+# small_val = 0.0000000000001
+# priors = [small_val, 1-2*small_val, small_val] 
+
 for i in range(test_data.shape[0]):
     for j in range(3):
         posterior = 1
@@ -139,13 +143,11 @@ Calculate the accuracy rate of the MAP detector (should exceed 90%)
 test_data_no_label = test_data.iloc[: , 1:]
 labels = test_data[0].tolist()
 print('Ground truth: ', labels)
-print(accuracy)
-
-print(prediction, len(prediction))
 
 # Show results with sklearn.decomposition.PCA function
 test_data_no_label = test_data.iloc[: , 1:]
-labels = test_data[0].tolist()
+labels = test_data[0].tolist()   # use labels (ground truth) as color difference
+labels = prediction              # use perdiction as color difference
 print(labels)
 
 # Plot test data using PCA with dimentions decreased to 3D
@@ -157,16 +159,20 @@ print(pca.explained_variance_)
 test_pca_3d = pca.transform(test_data_no_label) 
 fig1 = plt.figure() 
 ax = Axes3D(fig1, rect=[0, 0, 1, 1], elev=30, azim=20)
+target_names = ['wine 1','wine 2','wine 3']
 for i in range(len(labels)):
     if labels[i] == 1:
         c = 'r'
-        target_name = 'wine 1'
+        # target_name = 'wine 1'
+        target_name = target_names[0]
     elif labels[i] == 2:
         c = 'g'
-        target_name = 'wine 2'
+        # target_name = 'wine 2'
+        target_name = target_names[1]
     else:
         c = 'b'
-        target_name = 'wine 3'
+        # target_name = 'wine 3'
+        target_name = target_names[2]
     ax.scatter(test_pca_3d[i, 0], test_pca_3d[i, 1],test_pca_3d[i, 2],marker='o',c=c, label=target_name)
 
 # Plot test data using PCA with dimentions decreased to 2D
