@@ -11,7 +11,6 @@ Goal: determine which type of wine according to the given features
 *Note: all features are independent and the distribution of them is Gaussian distribution
 '''
 
-from cgi import test
 from math import exp, sqrt, pi
 import pandas as pd
 import numpy as np
