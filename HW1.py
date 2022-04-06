@@ -187,3 +187,4 @@ plt.show()
 # References:
 # https://towardsdatascience.com/mle-vs-map-a989f423ae5c
 # https://kknews.cc/zh-tw/code/kvzpj5b.html
+# https://github.com/ss80226/MAP_estimation
