@@ -19,6 +19,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sympy import false
+import scipy.stats
 
 # Build function for creating a Normal (Gaussain) distribution function
 def normal_dist(x, mean, stdev):
@@ -34,7 +35,7 @@ features = ["Wine type","Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Ma
 # Read .csv file  
 wineDataSet = pd.read_csv('Wine.csv', header=None)
 
-## Add title to dataset
+# # Add title to dataset
 # wineDataSet.columns = features
 
 # Find the number of different wines in the data set
@@ -124,7 +125,7 @@ for i in range(test_data.shape[0]):
     for j in range(3):
         posterior = 1
         for k in range(13):
-            posterior *= normal_dist(test_data[k+1].values[i], feature_distribution[13*j+k][0], feature_distribution[13*j+k][1])
+            posterior *= scipy.integrate.quad(normal_dist,test_data[k+1].values[i]-5e-7,test_data[k+1].values[i]+5e-7,args=(feature_distribution[13*j+k][0], feature_distribution[13*j+k][1]))[0]
         posterior *= priors[j]
         wine_posterior[j] = posterior
     prediction.append(wine_posterior.index(max(wine_posterior))+1)
@@ -188,3 +189,4 @@ plt.show()
 # https://towardsdatascience.com/mle-vs-map-a989f423ae5c
 # https://kknews.cc/zh-tw/code/kvzpj5b.html
 # https://github.com/ss80226/MAP_estimation
+
